@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 <h1 align="center">🍀Get Jobs【工作无忧】</h1>
 <div align="center">
 
@@ -348,9 +347,3 @@ is_send: true #开启企业微信消息推送
 [fossa-license-shield]: https://app.fossa.com/api/projects/git/Bgithub.com/Floks666/Fget_jobs.svg?type=shield
 
 [fossa-license-link]: https://app.fossa.com/projects/git/Bgithub.com/Floks666/Fget_jobs?ref=badge_shield
-=======
-# get_jobs2.0
-get_jobs的本地适应性开发  
-原项目地址：  
-https://github.com/loks666/get_jobs
->>>>>>> 43374fc6c21792243c4d9e3a19e901dff3b39f50

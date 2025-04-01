@@ -24,6 +24,7 @@ import java.math.RoundingMode;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -53,9 +54,26 @@ public class Boss {
     static int lastSize;
     static Date startDate;
     static BossConfig config = BossConfig.init();
-	static int maxPages = 10;
+    static int maxPages = 10;
+    // 配置日志文件路径
+    static String logFolderPath = "./src/main/java/boss/log";
+    static String logFileName;
+
+    static {
+        // 创建log文件夹
+        File logFolder = new File(logFolderPath);
+        if (!logFolder.exists()) {
+            logFolder.mkdirs();
+        }
+        
+        // 生成基于当前时间的日志文件名
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyyMMdd");
+        logFileName = logFolderPath + "/boss_" + dateFormat.format(new Date()) + ".log";
+        log.info("日志文件路径: {}", logFileName);
+    }
 
     public static void main(String[] args) {
+        log.info("开始Boss直聘自动投递任务，日志文件路径: {}", logFileName);
         loadData(dataPath);
         SeleniumUtil.initDriver();
         startDate = new Date();
@@ -312,6 +330,29 @@ public class Boss {
                 // 排除黑名单岗位
                 continue;
             }
+            
+            // 岗位名称黑名单关键词过滤
+            if (config.getEnableBlacklistJobFilter() && 
+                config.getBlacklistJobKeywords() != null && 
+                !config.getBlacklistJobKeywords().isEmpty()) {
+                
+                boolean isBlacklisted = false;
+                String jobNameLowerCase = jobName.toLowerCase(); // 转换为小写以实现不区分大小写
+                
+                for (String blacklistKeyword : config.getBlacklistJobKeywords()) {
+                    if (blacklistKeyword != null && !blacklistKeyword.isEmpty() && 
+                        jobNameLowerCase.contains(blacklistKeyword.toLowerCase())) {
+                        log.info("已过滤:【{}】岗位名称包含黑名单关键词【{}】", jobName, blacklistKeyword);
+                        isBlacklisted = true;
+                        break;
+                    }
+                }
+                
+                if (isBlacklisted) {
+                    continue;
+                }
+            }
+            
             String companyName = jobCard.findElement(By.cssSelector("div.company-info h3.company-name")).getText();
             if (blackCompanies.stream().anyMatch(companyName::contains)) {
                 // 排除黑名单公司

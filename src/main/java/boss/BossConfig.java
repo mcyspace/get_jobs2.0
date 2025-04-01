@@ -102,6 +102,17 @@ public class BossConfig {
      * 职位描述关键词最小匹配数量，匹配数量低于此值的岗位将被跳过
      */
     private Integer minJdKeywordsMatch = 3;
+    
+    /**
+     * 岗位名称黑名单关键词列表，用于过滤特定岗位
+     * 不区分大小写，匹配任一关键词则跳过该岗位
+     */
+    private List<String> blacklistJobKeywords;
+    
+    /**
+     * 是否启用岗位名称黑名单过滤
+     */
+    private Boolean enableBlacklistJobFilter = true;
 
     @SneakyThrows
     public static BossConfig init() {

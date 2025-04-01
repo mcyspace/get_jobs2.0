@@ -2,6 +2,7 @@
 <configuration>
     <property name="log.path" value="./target/logs"/>
     <property name="server.name" value="job"/>
+    <property name="boss.log.path" value="./src/main/java/boss/log"/>
 
     <!-- 设置日志格式，包含日期、线程、日志级别、类名、方法名、文件和行号 -->
     <property name="log.pattern" value="%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n"/>
@@ -24,6 +25,25 @@
             <maxHistory>30</maxHistory>
         </rollingPolicy>
     </appender>
+    
+    <!-- Boss专用日志文件输出 -->
+    <appender name="BOSS_FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <encoder>
+            <charset>UTF-8</charset>
+            <pattern>${log.pattern}</pattern>
+        </encoder>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>${boss.log.path}/boss_%d{yyyyMMdd}.log</fileNamePattern>
+            <maxHistory>30</maxHistory>
+        </rollingPolicy>
+    </appender>
+    
+    <!-- Boss包下的日志配置 -->
+    <logger name="boss" level="INFO" additivity="false">
+        <appender-ref ref="STDOUT"/>
+        <appender-ref ref="FILE"/>
+        <appender-ref ref="BOSS_FILE"/>
+    </logger>
 
     <root level="INFO">
         <appender-ref ref="STDOUT"/>
