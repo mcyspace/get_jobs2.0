@@ -92,6 +92,16 @@ public class BossConfig {
      * 等待时间
      */
     private String waitTime;
+    
+    /**
+     * 职位描述关键词列表，用于筛选JD
+     */
+    private List<String> jdKeywords;
+    
+    /**
+     * 职位描述关键词最小匹配数量，匹配数量低于此值的岗位将被跳过
+     */
+    private Integer minJdKeywordsMatch = 3;
 
     @SneakyThrows
     public static BossConfig init() {

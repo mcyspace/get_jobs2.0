@@ -383,6 +383,30 @@ public class Boss {
                     String jd = CHROME_DRIVER.findElement(By.xpath("//div[@class='job-sec-text']")).getText();
                     filterResult = checkJob(keyword, job.getJobName(), jd);
                 }
+                
+                // 获取JD描述并进行关键词匹配
+                String jdText = null;
+                try {
+                    jdText = CHROME_DRIVER.findElement(By.xpath("//div[@class='job-sec-text']")).getText();
+                    
+                    // 如果配置了JD关键词列表，进行关键词匹配检查
+                    if (config.getJdKeywords() != null && !config.getJdKeywords().isEmpty()) {
+                        int matchCount = countKeywordsMatch(jdText, config.getJdKeywords());
+                        
+                        // 如果匹配数量低于配置的最小值，跳过该岗位
+                        if (matchCount < config.getMinJdKeywordsMatch()) {
+                            log.info("已过滤:【{}】公司【{}】岗位JD匹配关键词数量【{}】低于最小要求【{}】", 
+                                job.getCompanyName(), job.getJobName(), matchCount, config.getMinJdKeywordsMatch());
+                            closeWindow(tabs);
+                            continue;
+                        } else {
+                            log.info("岗位JD关键词匹配成功，匹配数量【{}】", matchCount);
+                        }
+                    }
+                } catch (Exception e) {
+                    log.error("获取岗位JD描述异常: {}", e.getMessage());
+                }
+                
                 btn.click();
                 if (isLimit()) {
                     SeleniumUtil.sleep(1);
@@ -493,7 +517,7 @@ public class Boss {
      */
     private static boolean isSalaryNotExpected(String salary) {
         try {
-            // 1. 如果没有期望薪资范围，直接返回 false，表示“薪资并非不符合预期”
+            // 1. 如果没有期望薪资范围，直接返回 false，表示"薪资并非不符合预期"
             List<Integer> expectedSalary = config.getExpectedSalary();
             if (!hasExpectedSalary(expectedSalary)) {
                 return false;
@@ -502,7 +526,7 @@ public class Boss {
             // 2. 清理薪资文本（比如去掉 "·15薪"）
             salary = removeYearBonusText(salary);
 
-            // 3. 如果薪资格式不符合预期（如缺少 "K" / "k"），直接返回 true，表示“薪资不符合预期”
+            // 3. 如果薪资格式不符合预期（如缺少 "K" / "k"），直接返回 true，表示"薪资不符合预期"
             if (!isSalaryInExpectedFormat(salary)) {
                 return true;
             }
@@ -849,6 +873,20 @@ public class Boss {
         return false;
     }
 
+    private static int countKeywordsMatch(String jdText, List<String> keywords) {
+        if (jdText == null || jdText.isEmpty() || keywords == null || keywords.isEmpty()) {
+            return 0;
+        }
+        
+        int count = 0;
+        for (String keyword : keywords) {
+            if (keyword != null && !keyword.isEmpty() && jdText.contains(keyword)) {
+                count++;
+                log.debug("JD匹配到关键词: {}", keyword);
+            }
+        }
+        return count;
+    }
 
 }
 
