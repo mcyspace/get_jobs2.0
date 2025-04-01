@@ -353,6 +353,29 @@ public class Boss {
                 }
             }
             
+            // 岗位名称白名单关键词过滤
+            if (config.getEnableWhitelistJobFilter() && 
+                config.getWhitelistJobKeywords() != null && 
+                !config.getWhitelistJobKeywords().isEmpty()) {
+                
+                boolean isWhitelisted = false;
+                String jobNameLowerCase = jobName.toLowerCase(); // 转换为小写以实现不区分大小写
+                
+                for (String whitelistKeyword : config.getWhitelistJobKeywords()) {
+                    if (whitelistKeyword != null && !whitelistKeyword.isEmpty() && 
+                        jobNameLowerCase.contains(whitelistKeyword.toLowerCase())) {
+                        log.info("已匹配:【{}】岗位名称包含白名单关键词【{}】", jobName, whitelistKeyword);
+                        isWhitelisted = true;
+                        break;
+                    }
+                }
+                
+                if (!isWhitelisted) {
+                    log.info("已过滤:【{}】岗位名称未包含任何白名单关键词", jobName);
+                    continue;
+                }
+            }
+            
             String companyName = jobCard.findElement(By.cssSelector("div.company-info h3.company-name")).getText();
             if (blackCompanies.stream().anyMatch(companyName::contains)) {
                 // 排除黑名单公司

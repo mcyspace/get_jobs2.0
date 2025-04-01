@@ -113,6 +113,17 @@ public class BossConfig {
      * 是否启用岗位名称黑名单过滤
      */
     private Boolean enableBlacklistJobFilter = true;
+    
+    /**
+     * 岗位名称白名单关键词列表，用于筛选特定岗位
+     * 不区分大小写，匹配任一关键词则允许投递该岗位
+     */
+    private List<String> whitelistJobKeywords;
+    
+    /**
+     * 是否启用岗位名称白名单过滤
+     */
+    private Boolean enableWhitelistJobFilter = false;
 
     @SneakyThrows
     public static BossConfig init() {
